@@ -10,13 +10,12 @@ public class Group {
 	private String groupName;
 	private HashMap<Integer, Person> groupMembers; //HashMap to map each member to a unique id
 	private ArrayList<Transaction> groupTransactions;
-	private boolean simplifyCashFlows;
 
 	public Group(String name) {
 		this.groupName = name;
 		this.groupMembers = new HashMap<>();
 		this.groupTransactions = new ArrayList<>();
-		this.simplifyCashFlows = false;
+
 	}
 
 	public String getName() {
@@ -27,21 +26,15 @@ public class Group {
 		this.groupName= newName;
 	}
 
-	public boolean isSimplifyCashFlows() {
-		return this.simplifyCashFlows;
-	}
-
-	public void setSimplifyCashFlows(boolean simplifyCashFlows) {
-		this.simplifyCashFlows = simplifyCashFlows;
-	}
-
 	public void addGroupMember(Person p) {
 		if (this.groupMembers.containsKey(p.getName().hashCode()))
 			return;
 		this.groupMembers.putIfAbsent(p.getName().hashCode(), p);
+		p.getGroups().addGroup(this);
 	}
 	
 	public void deleteGroupMember(int key) {
+		this.groupMembers.get(key).getGroups().deleteGroup(this.hashCode());
 		this.groupMembers.remove(key);
 	}
 
@@ -55,20 +48,40 @@ public class Group {
 	
 	public void addGroupTransactions(Transaction transaction) {
 		this.groupTransactions.add(transaction);
-		//TODO Make changes in balances
-		this.adjustAllTransactions();
+
+		Person payer=transaction.getPayer();
+		ArrayList<Person> membersInvolved= transaction.getMembersInvolved();
+		double amount = transaction.getAmount();
 		
-		if(this.isSimplifyCashFlows() == true)
-			this.reduceCashFlows();
+		for(Person debter: membersInvolved) {
+			if(payer.hashCode() == debter.hashCode())
+				continue;
+			debter.addAmountOwed(payer, amount/membersInvolved.size());
+			
+		}
+		
+		this.adjustAllTransactions();
+
 	}
 	
 	public void deleteGroupTransaction(ArrayList<Transaction> transactions) {
 		this.groupTransactions.removeAll(transactions);
-		//TODO Make changes in balances
-		this.adjustAllTransactions();
+
+		for(Transaction transaction: transactions) {
+			Person payer=transaction.getPayer();
+			ArrayList<Person> membersInvolved= transaction.getMembersInvolved();
+			double amount = transaction.getAmount();
+			
+			for(Person debter: membersInvolved) {
+				if(payer.hashCode() == debter.hashCode())
+					continue;
+				debter.subtractAmountOwed(payer, amount/membersInvolved.size());
+				
+			}
+		}
 		
-		if(this.isSimplifyCashFlows() == true)
-			this.reduceCashFlows();
+		this.adjustAllTransactions();
+
 	}
 	
 	public ArrayList<Transaction> getTransactions() {
@@ -112,9 +125,5 @@ public class Group {
 
 			}
 		}
-	}
-	
-	public void reduceCashFlows() {
-		//TODO
 	}
 }

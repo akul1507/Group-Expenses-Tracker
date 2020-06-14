@@ -38,10 +38,6 @@ public class Person {
 		return this.amountToRecieve;
 	}
 
-	public void setAmountToRecieve(double amountToRecieve) {
-		this.amountToRecieve = amountToRecieve;
-	}
-
 	public GroupList getGroups() {
 		return this.groups;
 	}
@@ -88,4 +84,5 @@ public class Person {
 		}
 		this.amountOwedAfterAdjustments.putIfAbsent(p, amount);
 	}
+	
 }

@@ -19,7 +19,9 @@ public class Transaction {
 	public Person getPayer() {
 		return this.payer;
 	}
-
+	public double getAmount() {
+		return this.amount;
+	}
 	public ArrayList<Person> getMembersInvolved() {
 		return new ArrayList<Person> (this.membersInvolved);
 	}

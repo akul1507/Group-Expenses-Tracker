@@ -20,8 +20,25 @@ public class GroupList {
 	public ArrayList<Group> getGroupList() {
 		return new ArrayList<Group> (this.groupList.values());
 	}
+	
+	public HashMap<Integer, Group> getGroupListMap(){
+		return this.groupList;
+	}
 
 	public void deleteGroup(int key) {
 		this.groupList.remove(key);
+	}
+	
+	@Override
+	public String toString() {
+		String s="";
+		
+		for(Group group:this.getGroupList()) {
+			s=s + group.getName() + "\n";
+		}
+		
+		
+		return s;
+		
 	}
 }
